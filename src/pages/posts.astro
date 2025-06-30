@@ -1,3 +1,5 @@
+---
+import Layout from '~/layouts/Layout.astro'
 import { sanity } from '~/lib/sanity'
 
 const posts = await sanity.fetch(`*[_type == "post"] | order(publishedAt desc) {
@@ -10,4 +12,19 @@ const posts = await sanity.fetch(`*[_type == "post"] | order(publishedAt desc) {
   },
   publishedAt
 }`)
+---
 
+<Layout title="Posts">
+  <h1 class="text-3xl font-bold mb-6">Posts</h1>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {posts.map(post => (
+      <a href={`/posts/${post.slug.current}`} class="block border rounded-lg p-4 hover:shadow-lg transition">
+        {post.mainImage?.asset?.url && (
+          <img src={post.mainImage.asset.url} alt={post.title} class="mb-2 rounded" />
+        )}
+        <h2 class="text-xl font-semibold">{post.title}</h2>
+        <p class="text-sm text-gray-500">{new Date(post.publishedAt).toLocaleDateString()}</p>
+      </a>
+    ))}
+  </div>
+</Layout>
