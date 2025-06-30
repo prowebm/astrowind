@@ -1,0 +1,40 @@
+﻿---
+import Layout from '../../layouts/Layout.astro'
+import { sanity } from '../../lib/sanity'
+import { renderPortableText } from '../../lib/portableTextToHtml'
+
+export async function getStaticPaths() {
+  const slugs = await sanity.fetch(`*[_type == "post" && defined(slug.current)][]{
+    "params": { "slug": slug.current }
+  }`)
+  return slugs
+}
+
+const { slug } = Astro.params
+
+const query = `*[_type == "post" && slug.current == $slug][0] {
+  title,
+  publishedAt,
+  mainImage {
+    asset->{
+      url
+    }
+  },
+  body
+}`
+
+const post = await sanity.fetch(query, { slug })
+const htmlBody = renderPortableText(post.body)
+---
+
+<Layout title={post.title}>
+  <a href="/posts">← Voltar</a>
+  <h1>{post.title}</h1>
+  <p><em>{new Date(post.publishedAt).toLocaleDateString()}</em></p>
+
+  {post.mainImage?.asset?.url && (
+    <img src={post.mainImage.asset.url} alt={post.title} />
+  )}
+
+  <article set:html={htmlBody} />
+</Layout>
