@@ -1,5 +1,5 @@
 ﻿---
-import Layout from '~/layouts/Layout.astro'
+import PageLayout from '~/layouts/PageLayout.astro'
 import { sanity } from '~/lib/sanity'
 import { renderPortableText } from '~/lib/renderPortableText'
 
@@ -15,6 +15,7 @@ const { slug } = Astro.params
 const post = await sanity.fetch(`*[_type == "post" && slug.current == $slug][0] {
   title,
   publishedAt,
+  excerpt,
   mainImage {
     asset->{
       url
@@ -26,13 +27,13 @@ const post = await sanity.fetch(`*[_type == "post" && slug.current == $slug][0] 
 const htmlBody = renderPortableText(post.body)
 ---
 
-<Layout title={post.title}>
-  <article class="prose lg:prose-xl">
+<PageLayout title={post.title}>
+  <article class="prose lg:prose-xl max-w-4xl mx-auto py-12">
     <h1>{post.title}</h1>
     <p><em>{new Date(post.publishedAt).toLocaleDateString()}</em></p>
     {post.mainImage?.asset?.url && (
-      <img src={post.mainImage.asset.url} alt={post.title} />
+      <img src={post.mainImage.asset.url} alt={post.title} class="my-6 rounded" />
     )}
     <div set:html={htmlBody} />
   </article>
-</Layout>
+</PageLayout>

@@ -1,71 +1,41 @@
 ---
-import { APP_BLOG } from 'astrowind:config';
-import type { Post } from '~/types';
-
-import Image from '~/components/common/Image.astro';
-
-import { findImage } from '~/utils/images';
-import { getPermalink } from '~/utils/permalinks';
+import type { Post } from '~/types'
 
 export interface Props {
-  post: Post;
+  post: Post
 }
 
-const { post } = Astro.props;
-const image = await findImage(post.image);
+const { post } = Astro.props
 
-const link = APP_BLOG?.post?.isEnabled ? getPermalink(post.permalink, 'post') : '';
+const imageUrl = post.mainImage?.asset?.url
+const link = post.slug?.current ? `/posts/${post.slug.current}` : '#'
 ---
 
-<article
-  class="mb-6 transition intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade"
->
-  <div class="relative md:h-64 bg-gray-400 dark:bg-slate-700 rounded shadow-lg mb-6">
-    {
-      image &&
-        (link ? (
-          <a href={link}>
-            <Image
-              src={image}
-              class="w-full md:h-full rounded shadow-lg bg-gray-400 dark:bg-slate-700"
-              widths={[400, 900]}
-              width={400}
-              sizes="(max-width: 900px) 400px, 900px"
-              alt={post.title}
-              aspectRatio="16:9"
-              layout="cover"
-              loading="lazy"
-              decoding="async"
-            />
-          </a>
-        ) : (
-          <Image
-            src={image}
-            class="w-full md:h-full rounded shadow-lg bg-gray-400 dark:bg-slate-700"
-            widths={[400, 900]}
-            width={400}
-            sizes="(max-width: 900px) 400px, 900px"
-            alt={post.title}
-            aspectRatio="16:9"
-            layout="cover"
-            loading="lazy"
-            decoding="async"
-          />
-        ))
-    }
-  </div>
+<article class="mb-6 transition intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade">
+  {imageUrl && (
+    <a href={link}>
+      <img
+        src={imageUrl}
+        alt={post.title}
+        class="w-full md:h-64 rounded shadow-lg object-cover mb-6"
+        loading="lazy"
+        decoding="async"
+      />
+    </a>
+  )}
 
   <h3 class="text-xl sm:text-2xl font-bold leading-tight mb-2 font-heading dark:text-slate-300">
-    {
-      link ? (
-        <a class="inline-block hover:text-primary dark:hover:text-blue-700 transition ease-in duration-200" href={link}>
-          {post.title}
-        </a>
-      ) : (
-        post.title
-      )
-    }
+    <!-- Linha pedida explicitamente -->
+    <a href={`/posts/${post.slug.current}`}>{post.title}</a>
   </h3>
 
-  <p class="text-muted dark:text-slate-400 text-lg">{post.excerpt}</p>
+  {post.publishedAt && (
+    <p class="text-sm text-muted dark:text-slate-400 mb-1">
+      {new Date(post.publishedAt).toLocaleDateString()}
+    </p>
+  )}
+
+  {post.excerpt && (
+    <p class="text-base text-slate-600 dark:text-slate-400">{post.excerpt}</p>
+  )}
 </article>

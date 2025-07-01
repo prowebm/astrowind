@@ -1,31 +1,26 @@
 ---
-import { APP_BLOG } from 'astrowind:config';
-
-import { getRelatedPosts } from '~/utils/blog';
-import BlogHighlightedPosts from '../widgets/BlogHighlightedPosts.astro';
-import type { Post } from '~/types';
-import { getBlogPermalink } from '~/utils/permalinks';
+import Grid from '~/components/blog/Grid.astro'
+import WidgetWrapper from '~/components/ui/WidgetWrapper.astro'
+import { getRelatedPosts } from '~/utils/blog'
+import type { Post } from '~/types'
 
 export interface Props {
-  post: Post;
+  post: Post
 }
 
-const { post } = Astro.props;
-
-const relatedPosts = post.tags ? await getRelatedPosts(post, 4) : [];
+const { post } = Astro.props
+const relatedPosts = post.tags ? await getRelatedPosts(post, 4) : []
 ---
 
-{
-  APP_BLOG.isRelatedPostsEnabled ? (
-    <BlogHighlightedPosts
-      classes={{
-        container:
-          'pt-0 lg:pt-0 md:pt-0 intersect-once intersect-quarter motion-safe:md:opacity-0 motion-safe:md:intersect:animate-fade',
-      }}
-      title="Related Posts"
-      linkText="View All Posts"
-      linkUrl={getBlogPermalink()}
-      postIds={relatedPosts.map((post) => post.id)}
-    />
-  ) : null
-}
+{relatedPosts.length > 0 && (
+  <WidgetWrapper>
+    <div class="flex flex-col lg:justify-between lg:flex-row mb-8">
+      <div class="md:max-w-sm">
+        <h2 class="text-3xl font-bold tracking-tight sm:text-4xl sm:leading-none group font-heading mb-2">
+          Related Posts
+        </h2>
+      </div>
+    </div>
+    <Grid posts={relatedPosts} />
+  </WidgetWrapper>
+)}

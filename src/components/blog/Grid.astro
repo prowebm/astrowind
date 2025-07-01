@@ -1,14 +1,27 @@
 ---
-import Item from '~/components/blog/GridItem.astro';
-import type { Post } from '~/types';
+import GridItem from '~/components/blog/GridItem.astro'
 
 export interface Props {
-  posts: Array<Post>;
+  posts: Array<{
+    title: string
+    slug: { current: string }
+    publishedAt?: string
+    mainImage?: {
+      asset?: {
+        url?: string
+      }
+    }
+  }>
 }
 
-const { posts } = Astro.props;
+const { posts } = Astro.props
 ---
 
-<div class="grid gap-6 row-gap-5 md:grid-cols-2 lg:grid-cols-4 -mb-6">
-  {posts.map((post) => <Item post={post} />)}
-</div>
+{posts && posts.length > 0 ? (
+  <div class="grid gap-6 row-gap-5 md:grid-cols-2 lg:grid-cols-4 -mb-6">
+    {posts.map((post) => <GridItem post={post} />)}
+  </div>
+) : (
+  <p class="text-gray-500 dark:text-gray-400">Sem posts disponíveis.</p>
+)}
+
